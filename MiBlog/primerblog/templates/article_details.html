@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}
+
+{{ post.title}} 
+
+{% endblock %}
+
+{% block content %}
+
+    <h1>{{ post.title}}</h1>
+    <small>Por: {{post.author.first_name }} {{post.author.last_name }} - {{ post.post_date}} - 
+        {% if user.is_authenticated %}
+            {% if user.id == post.author.id %}
+                <a href="{% url "update_post" post.pk %}"class="btn btn-primary btn-sm">Editar</a> <a href="{% url "delete_post" post.pk %}"class="btn btn-danger btn-sm">Borrar</a></small><br/>
+            {% endif %}
+        {% endif %}
+
+
+        <hr>
+    <br/>
+    {% if post.header_image %}
+        <img src="{{ post.header_image.url }}" width=150 height=150>
+    {% endif %}
+    <br/><br/>
+    {{ post.body|safe }}
+
+    
+
+
+    <a href="{% url "home" %}" class="btn btn-secondary">Volver</a>
+
+
+<br><br/>
+<hr>
+<br/>
+<form action="{% url "like_post" post.pk %}" method="POST">
+    {% csrf_token %}
+    {% if user.is_authenticated %}
+        {% if liked %}
+            <button type ="submit", name="post_id", value ="{{ post.id }}", class="btn btn-danger btn-sm"> No Like </button> 
+        {% else %}
+            <button type ="submit", name="post_id", value ="{{ post.id }}", class="btn btn-primary btn-sm"> Like </button>
+        {% endif %}
+        
+    {% else %}
+
+        <a href="{% url "login" %}">Login</a> para dar Like.
+    {% endif %}
+        
+        - {{ total_likes }} Likes
+
+    </form>
+<br/><br/>
+<h1> Comentarios</h1>
+
+    {% if not post.comments.all %}
+        Sin comentarios aun <a href="{% url "add_comment" post.pk %}"> Agregar uno</a>
+    {% else %}
+        
+        {% for comment in post.comments.all %}
+        <br/>
+            <strong> {{ comment.name }} - {{ comment.date_added }} </strong>
+            <br/>
+            {{ comment.body}}
+            
+        {% endfor %}
+            <br/>
+            <a href="{% url "add_comment" post.pk %}"> Agregar comentario</a><br/>
+            
+    {% endif %}
+    <br/>
+    
+    <br/>
+    <div class="card mb-3">
+        <div class="row no-gutters">
+        <div class="col-md-2">
+    {% if post.author.profile.profile_pic %}
+            <img src="{{post.author.profile.profile_pic.url }}" class="rounded-circle" width=150 height=150 class="rounded-circle">
+    {% else %}
+            <img src="{% static "primerblog/images/descarga.jpg" %}" class="card-img">
+    {% endif %}
+        </div>
+      <div class="col-md-10">
+        <div class="card-body">
+          <h5 class="card-title">{{post.author.first_name }} {{post.author.last_name }} </h5>
+          <a href="{% url "show_profile_page" post.author.profile.id %}"> Perfil</a>
+          <p class="card-text">{{post.author.profile.bio }}</p>
+          <p class="card-text">
+            
+          <small class="text-muted"></small></p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+    {% endblock %}

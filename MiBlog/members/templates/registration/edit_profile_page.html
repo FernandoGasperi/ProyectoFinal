@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block title %}
+
+Editar Perfil!!  
+
+{% endblock %}
+{% block content %}
+
+{% if user.is_authenticated %}
+    {% if user.id == profile.user.id %}
+        <h1>Editar Perfil</h1>
+        <br/><br/>
+        
+        <div class="form-group">
+            <form method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+                
+                {{ form.as_p }}
+                
+                <button class="btn btn-secondary">Editar Prfil</button>
+            </form>
+        </div>
+        <script>
+            var name = "{{ user.id }}";
+            document.getElementById("fer").value = name;
+        </script>
+
+
+
+    {% else %}
+
+    Usuario no indicado para cambiar perfil
+
+    {% endif %}
+{% else %}
+    No permitido 
+{% endif %}
+
+
+
+{% endblock %}
